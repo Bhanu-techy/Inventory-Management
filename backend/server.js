@@ -2,6 +2,8 @@ const express = require("express")
 const app = express();
 const router = express.Router();
 const PORT = 3000;
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
 
 app.use(express.json());
 
@@ -14,6 +16,93 @@ const upload = multer({
   dest: 'uploads/'   
 });
 
+
+app.get("/users", (req, res)=>{
+  db.all(`select * from users`,[],(err, rows) =>{
+    res.json(rows)
+  })
+})
+
+app.post ("/register", async (req, res)=>{
+  const {name, password} = req.body
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  db.get(`select * from users where name = '${name}'`,(err, user) =>{
+    if (err) return res.json({error:  err})
+    if (user === undefined){
+    db.run(`insert into users (name, password) values(?,?)`, [name, hashedPassword], (err)=>{
+      if (err) return res.status(500).json({ error: err });
+      res.send({message : 'user registered'})
+    })
+  }else {
+    res.status = 400;
+    res.send("User already exists");
+  }
+  })
+})
+
+app.post("/login", async (req, res)=>{
+  const {name, password} = req.body
+ 
+
+   db.get(`select * from users where name = '${name}'`,async (err, user) =>{
+    if (err) return res.json({error:  err})
+    if (user === undefined){
+      res.status(400);
+      res.send("Invalid User");
+    }else {
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    console.log(isPasswordMatched)
+    if (isPasswordMatched) {
+      const payload = {
+        name: name,
+      };
+      const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
+      res.send({ jwtToken });
+    } else {
+      res.status(400);
+      res.send("Invalid Password");
+    }
+  }})
+
+})
+
+app.delete("/users/:id", async (req, res)=>{
+  const {id} = req.params
+  const query = `delete from users where id = ${id}`
+  await db.run(query)
+  res.json({msg : 'done'})
+})
+
+const authenticateToken = (request, response, next) => {
+  let jwtToken;
+  const authHeader = request.headers["authorization"];
+  if (authHeader !== undefined) {
+    jwtToken = authHeader.split(" ")[1];
+  }
+  if (jwtToken === undefined) {
+    response.status(401);
+    response.send("Invalid JWT Token");
+  } else {
+    jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, payload) => {
+      if (error) {
+        response.status(401);
+        response.send("Invalid JWT Token");
+      } else {
+        next();
+      }
+    });
+  }
+};
+
+app.post("/login", async (req, res) =>{
+  const {name, password} = req.body
+  const addUserQuery = `insert into users (name, password)
+  values('${name}', '${password}')`
+  const dbResponse = await db.run(addUserQuery)
+  const userId = dbResponse.lastID
+  res.json({userId : userId})
+})
 
 router.post("/import", upload.single("csvFile"), (req, res) => {
   const filePath = req.file.path;
@@ -164,7 +253,6 @@ router.get("/products/export", (req, res) => {
         res.send(csv);
     });
 });
-
 
 
 app.listen(PORT, () => {
