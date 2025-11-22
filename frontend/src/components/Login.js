@@ -14,19 +14,20 @@ function Login() {
   const onClickLogin = async () =>{
     const url = 'https://inventory-management-jj3z.onrender.com/login'
     const userDetails = {name, password}
-    const headers = {
+   
+    const options = {
       method : "POST",
-      'Content-Type': 'application/json',
+      headers : {"Content-Type" : "application/json"},
       body : JSON.stringify(userDetails)
     }
-    const response= await fetch(url, headers)
+    const response= await fetch(url, options)
     const data = await response.json()
     console.log(data)
     if (response.ok) {
       Cookies.set('jwt_token', data.jwt_token, {expires: 30})
       navigate("/", {replace : true})
     } else {
-      setErrmsg(data.error_msg)
+      setErrmsg(data)
       setShowErr(true)
     }
   }
@@ -41,12 +42,12 @@ function Login() {
         <div className='m-3'>
           <div className='flex flex-col m-2'>
             <label htmlFor='name'>NAME</label>
-          <input type='text' id="name" className='bg-gray-200 m-1 w-[300px] rounded h-[40px]'
+          <input type='text' id="name" className='bg-gray-200 m-1 w-[300px] rounded h-[40px] p-1'
            value={name} onChange={(e)=>setName(e.target.value)}/>
           </div>
           <div className='flex flex-col m-2'>
             <label htmlFor='password'>PASSWORD</label>
-          <input type='password' id="password" className='bg-gray-200 m-1 w-[300px] rounded h-[40px]'
+          <input type='password' id="password" className='bg-gray-200 m-1 w-[300px] rounded h-[40px] p-1'
            value={password} onChange={(e)=>setPassword(e.target.value)}/>
           </div>
         </div>
