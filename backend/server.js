@@ -170,23 +170,23 @@ app.get("/api/products", authenticateToken, (req, res) => {
 
 // UPDATE STOCK + HISTORY
 
-app.put("/api/products/:id/stock", authenticateToken, (req, res) => {
+app.put("/api/products/:id", authenticateToken, (req, res) => {
   const { id } = req.params;
-  const { new_stock, user_info } = req.body;
+  const { new_stock, name, brand, user_info } = req.body;
 
-  if (new_stock == null) {
+   if (new_stock === undefined) {
     return res.status(400).json({ error: "new_stock is required" });
   }
 
-  // Get current stock
+  const newStock = Number(new_stock);
+
   db.get("SELECT stock FROM products WHERE id = ?", [id], (err, product) => {
     if (err || !product)
       return res.status(404).json({ error: "Product not found" });
 
     const old_quantity = product.stock;
 
-    // Update stock
-  db.run("UPDATE products SET stock = ? WHERE id = ?", [new_stock, id], (err) => {
+  db.run("UPDATE products SET stock = ?, name = ?, brand = ? WHERE id = ?", [newStock, name, brand, id], (err) => {
       if (err) return res.status(500).json({ error: err });
 
       // Insert into history
@@ -195,10 +195,10 @@ app.put("/api/products/:id/stock", authenticateToken, (req, res) => {
         VALUES (?, ?, ?, datetime('now'), ?)
       `;
 
-db.run(historyQuery, [id, old_quantity, new_stock, user_info || "system"], (err) => {
+db.run(historyQuery, [id, old_quantity, new_stock, user_info || "updated"], (err) => {
         if (err) return res.status(500).json({ error: err });
 
-        res.json({ message: "Stock updated", old_quantity, new_quantity: new_stock });
+        res.json({ message: "Stock updated", old_quantity, new_quantity: new_stock, name });
       });
     });
   });

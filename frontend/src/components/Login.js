@@ -22,9 +22,9 @@ function Login() {
     }
     const response= await fetch(url, options)
     const data = await response.json()
-    console.log(data.jwt_token)
+    
     if (response.ok) {
-      Cookies.set('jwt_token', data.jwt_token, {expires: 30})
+      Cookies.set('jwt_token', data.jwtToken, {expires: 30})
       navigate("/", {replace : true})
     } else {
       setErrmsg(data.error_msg)
