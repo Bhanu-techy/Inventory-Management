@@ -26,12 +26,12 @@ const authenticateToken = (request, response, next) => {
   }
   if (jwtToken === undefined) {
     response.status(401);
-    response.send("Invalid JWT Token");
+    response.json({eror_msg :"Invalid JWT Token"});
   } else {
     jwt.verify(jwtToken, "MY_SECRET_TOKEN", async (error, payload) => {
       if (error) {
         response.status(401);
-        response.send("Invalid JWT Token");
+        response.json({error_msg :"Invalid JWT Token"});
       } else {
         next();
       }
@@ -63,7 +63,7 @@ app.post ("/register", async (req, res)=>{
     })
   }else {
     res.status = 400;
-    res.send("User already exists");
+    res.json({error_msg :"User already exists"});
   }
   })
 })
@@ -83,7 +83,7 @@ app.post("/login", async (req, res)=>{
         name: name,
       };
       const jwtToken = jwt.sign(payload, "MY_SECRET_TOKEN");
-      res.send({ jwtToken });
+      res.json({ jwtToken });
     } else {
       res.status(400);
       res.json({error_msg:"Invalid Password"});

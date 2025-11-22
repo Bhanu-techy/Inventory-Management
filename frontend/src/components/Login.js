@@ -22,12 +22,12 @@ function Login() {
     }
     const response= await fetch(url, options)
     const data = await response.json()
-    console.log(data)
+    console.log(data.jwt_token)
     if (response.ok) {
       Cookies.set('jwt_token', data.jwt_token, {expires: 30})
       navigate("/", {replace : true})
     } else {
-      setErrmsg(data)
+      setErrmsg(data.error_msg)
       setShowErr(true)
     }
   }
@@ -36,7 +36,7 @@ function Login() {
     <div className='w-full h-[100vh] flex justify-center items-center'>
       <div className='w-[40%] border border-solid-gray h-[400px] flex flex-col justify-center items-center p-3'>
         <div className='w-[50%] flex justify-around m-3'>
-          <button className={`w-[100px] bg-gray-500 text-white rounded h-[32px]`} onClick={()=>setButton("Login")}>Login</button>
+          <button className={`w-[100px] bg-gray-500 text-white rounded h-[32px] mr-2`} onClick={()=>setButton("Login")}>Login</button>
           <button className={`w-[100px] bg-gray-500 text-white rounded h-[32px]`} onClick={()=>setButton("Register")}>Register</button>
         </div>
         <div className='m-3'>
@@ -51,7 +51,7 @@ function Login() {
            value={password} onChange={(e)=>setPassword(e.target.value)}/>
           </div>
         </div>
-        {showErr && <p className='text-red-500'>{errMsg}</p>}
+       {showErr && <p className='text-red-500 mb-2'>! {errMsg}</p>}
        {button === "Login" && <button className='w-[100px] h-[30px] bg-blue-500 text-white rounded' onClick={onClickLogin}>Login</button>}
        {button === "Register" && <button className='w-[100px] h-[30px] bg-blue-500 text-white rounded'>Register</button>
        }
