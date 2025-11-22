@@ -4,7 +4,9 @@ const router = express.Router();
 const PORT = 3000;
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
+const cors = require("cors")
 
+app.use(cors())
 app.use(express.json());
 
 const sqlite3 = require('sqlite3').verbose();
@@ -203,7 +205,7 @@ db.run(historyQuery, [id, old_quantity, new_stock, user_info || "system"], (err)
 });
 
 
-app.delete("/api/products/:id", (req, res) => {
+app.delete("/api/products/:id", authenticateToken, (req, res) => {
   const { id } = req.params;
 
   db.run("DELETE FROM products WHERE id = ?", [id], function (err) {
@@ -219,7 +221,7 @@ app.delete("/api/products/:id", (req, res) => {
 
 // GET INVENTORY HISTORY FOR A PRODUCT
 
-app.get("/api/products/:id/history", (req, res) => {
+app.get("/api/products/:id/history", authenticateToken, (req, res) => {
   const { id } = req.params;
 
   db.all("SELECT * FROM inventory_history WHERE product_id = ?", [id], (err, rows) => {
@@ -228,7 +230,7 @@ app.get("/api/products/:id/history", (req, res) => {
   });
 });
 
-router.get("/products/export", (req, res) => {
+router.get("/products/export", authenticateToken, (req, res) => {
     db.all("SELECT * FROM products", [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: "Database error" });
