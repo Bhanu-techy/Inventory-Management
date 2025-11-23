@@ -160,20 +160,23 @@ router.post("/import", upload.single("csvFile"), (req, res) => {
     });
 });
 
-
-
 app.get("/api/products", authenticateToken, (req, res) => {
-  const { name, category } = req.query;
+  let { name, category } = req.query;
+
+  // Convert " " " into empty string
+  if (name === '""') name = "";
+  if (category === '""') category = "";
 
   let query = "SELECT * FROM products WHERE 1=1";
   let params = [];
 
-  if (name) {
+  // Only filter if NOT empty
+  if (name && name.trim() !== "") {
     query += " AND name LIKE ?";
     params.push(`%${name}%`);
   }
 
-  if (category) {
+  if (category && category.trim() !== "") {
     query += " AND category = ?";
     params.push(category);
   }
@@ -183,6 +186,7 @@ app.get("/api/products", authenticateToken, (req, res) => {
     res.json(rows);
   });
 });
+
 
 
 // UPDATE STOCK + HISTORY
