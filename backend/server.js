@@ -163,11 +163,27 @@ router.post("/import", upload.single("csvFile"), (req, res) => {
 
 
 app.get("/api/products", authenticateToken, (req, res) => {
-  db.all("SELECT * FROM products", [], (err, rows) => {
-    if (err) return res.status(500).json({ error: err });
+  const { name, category } = req.query;
+
+  let query = "SELECT * FROM products WHERE 1=1";
+  let params = [];
+
+  if (name) {
+    query += " AND name LIKE ?";
+    params.push(`%${name}%`);
+  }
+
+  if (category) {
+    query += " AND category = ?";
+    params.push(category);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) return res.status(500).json({ error: "Database error" });
     res.json(rows);
   });
 });
+
 
 // UPDATE STOCK + HISTORY
 
