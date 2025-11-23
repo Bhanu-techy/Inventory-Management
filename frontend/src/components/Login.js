@@ -34,7 +34,7 @@ function Login() {
 
   return (
     <div className='w-full h-[100vh] flex justify-center items-center'>
-      <div className='w-[40%] border border-solid-gray h-[400px] flex flex-col justify-center items-center p-3'>
+      <div className='md:w-[40%] sm:[80%] border border-solid-gray h-[400px] flex flex-col justify-center items-center p-3'>
         <div className='w-[50%] flex justify-around m-3'>
           <button className={`w-[100px] bg-gray-500 text-white rounded h-[32px] mr-2`} onClick={()=>setButton("Login")}>Login</button>
           <button className={`w-[100px] bg-gray-500 text-white rounded h-[32px]`} onClick={()=>setButton("Register")}>Register</button>

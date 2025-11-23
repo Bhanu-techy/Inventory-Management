@@ -14,11 +14,12 @@ function ProductTable() {
   const [brand, setBrand] = useState("")
   const [name, setName] = useState("")
 
+  const token = Cookies.get('jwt_token')
+
   useEffect(()=>{
     const getProducts = async () =>{
-    const token = Cookies.get('jwt_token')
         
-    const url='https://inventory-management-jj3z.onrender.com/api/products'
+    const url=`https://inventory-management-jj3z.onrender.com/api/products`
     const options = {
         method : "GET",
         headers : {
@@ -29,7 +30,20 @@ function ProductTable() {
       setData(data)
     }
     getProducts()
-  },[])
+  },[token])
+
+  const getFilterProducts = async(query, category)=>{
+    const url=`https://inventory-management-jj3z.onrender.com/api/products?name=${query}&category=${category}`
+    const options = {
+        method : "GET",
+        headers : {
+          "authorization" : `breaer ${token}`}
+      }
+      const response = await fetch(url, options)
+      const data = await response.json()
+      setData(data)
+       console.log(category)
+  }
 
   const onClickEdit = (id) => {
     setEiditing(true)
@@ -41,27 +55,28 @@ function ProductTable() {
     setView(true)
   }
   
-      const onSubmitEdit = async (e) =>{
-        e.preventDefault()
-        const token = Cookies.get('jwt_token')
-                
-        const url=`https://inventory-management-jj3z.onrender.com/api/products/${id}`
-        const details = {new_stock : newstock, brand, name, user_info:""}
-        const options = {
-            method : "PUT",
-            headers : {
-                "Content-Type" : "application/json",
-                "authorization" : `breaer ${token}`},
-            body : JSON.stringify(details)
-            }
-        const response = await fetch(url, options)
-        const data = await response.json()
-        console.log(data)
-    }
+    const onSubmitEdit = async (e) =>{
+      e.preventDefault()
+      const token = Cookies.get('jwt_token')
+              
+      const url=`https://inventory-management-jj3z.onrender.com/api/products/${id}`
+      const details = {new_stock : newstock, brand, name, user_info:""}
+      const options = {
+          method : "PUT",
+          headers : {
+              "Content-Type" : "application/json",
+              "authorization" : `breaer ${token}`},
+          body : JSON.stringify(details)
+          }
+      const response = await fetch(url, options)
+      const data = await response.json()
+      console.log(data)
+  }
+
 
   return (
     <div className='w-full h-[100vh]'>
-        <Header/>
+        <Header getFilterProducts={getFilterProducts}/>
         <div className='w-full h-full flex'>
         {viewHistory && <SideBar id={id}/>}
         <div className='w-full flex flex-col justify-center items-center h-full'>
