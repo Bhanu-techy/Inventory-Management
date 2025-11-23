@@ -1,6 +1,6 @@
 # Title
 
-    Inventory Management 
+**Inventory Management**
 
 1. Objective
 
@@ -24,7 +24,7 @@ No special hardware is required beyond a standard development setup. Ensure your
 
 ## **Backend Tasks (Node.js, Express, SQLite)**
 
-### **2.1. Products API Endpoints**
+### **1. Products API Endpoints**
 
 ### **A. Get Products List API (GET `/api/products`)**
 
@@ -166,19 +166,52 @@ Organize your project files logically for easy navigation. Here's a typical stru
 This structure separates concerns: Components for UI, src for logic, and root for config.
 
 
-### Guidelines to develop a project
-
-- Create a new React app using Create React App (CRA), which sets up a basic structure.
-- Run: `npx create-react-app dynamic-diagram-flow`.
-- Navigate into the project folder: `cd dynamic-diagram-flow`.
-- Start the development server: `npm start`. This opens the app in your browser at `http://localhost:3000`. Verify it runs without errors.
-
-
 ### Third-party packages
 
-    - React Flow: For rendering interactive diagrams (install via npm).
-    - Optional: React Context or Redux for state management; use built-in React hooks if keeping it simple.
+- React icons: For search button.
+- Optional: React Context or Redux for state management; use built-in React hooks if keeping it simple.
 
-### Backend Deployment Link:
+### **Deployment Steps**
 
-***Render** : 
+1. **Backend Deployment (Render/Other Service):**
+    - Configure the service to run `npm start` (ensure your `package.json` has a start script).
+    - Set environment variables (if any, like database path or JWT secret).
+    - Ensure the SQLite database file is either included and writeable or use a service like **Render's Native PostgreSQL** for a persistent production database (SQLite is often tricky for services that don't guarantee file system persistence).
+2. **Frontend Deployment (Netlify/Vercel):**
+    - Configure the service to build the React application (`npm run build`).
+    - The build output should be served.
+    - **Crucial:** Update all API calls in the frontend to use the **live, public URL** of the deployed backend.
+
+## **Submission Requirements**
+
+1. **GitHub Repository Link:** Share the link to the public repository.
+2. **Live Backend Link:** Share the URL for the deployed Node/Express API.
+3. **Live Frontend Link:** Share the URL for the deployed React application.
+
+
+
+## Backend Deployment Link:
+
+***Render** : https://inventory-management-jj3z.onrender.com
+
+## User Credentials
+
+<details>
+<summary>Login Users</summary>
+
+<br/>
+
+```
+Name : bhanu
+password : bhanu@1234
+
+Name : rahul
+Password : rahul@1234
+
+Name : sai
+Password : sai@1234
+
+```
+
+<br/>
+</details>
