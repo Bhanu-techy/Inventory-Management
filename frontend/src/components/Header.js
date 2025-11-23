@@ -31,10 +31,6 @@ function Header({ getFilterProducts}) {
               Authorization: `Bearer ${token}`, }
           }
         const response = await fetch(url, options)
-          console.log(response)
-        if (!response.ok) {
-          throw new Error("Failed to download CSV");
-        }
 
         const blob = await response.blob();
         const urllink = window.URL.createObjectURL(blob);

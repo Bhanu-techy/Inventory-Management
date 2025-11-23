@@ -8,6 +8,13 @@ const cors = require("cors")
 app.use("/api", router);
 
 app.use(cors())
+
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+}));
+
 app.use(express.json());
 
 const sqlite3 = require('sqlite3').verbose();
@@ -187,8 +194,6 @@ app.get("/api/products", authenticateToken, (req, res) => {
   });
 });
 
-
-
 // UPDATE STOCK + HISTORY
 
 app.put("/api/products/:id", authenticateToken, (req, res) => {
@@ -251,7 +256,9 @@ app.get("/api/products/:id/history", authenticateToken, (req, res) => {
   });
 });
 
-router.get("/products/export", authenticateToken, (req, res) => {
+router.options("/products/export", cors());
+
+router.get("/products/export", cors(), authenticateToken, (req, res) => {
     db.all("SELECT * FROM products", [], (err, rows) => {
         if (err) {
             return res.status(500).json({ error: "Database error" });
