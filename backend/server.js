@@ -96,7 +96,7 @@ app.delete("/users/:id", async (req, res)=>{
 })
 
 
-app.get("/api/products", (req, res) => {
+app.get("/api/products", authenticateToken, (req, res) => {
   let { name, category } = req.query;
 
   // Convert " " " into empty string
