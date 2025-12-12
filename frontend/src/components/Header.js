@@ -21,32 +21,6 @@ function Header({ getFilterProducts}) {
   }
 
 
-  const onClickExport = async () => {
-      try {
-        const token = Cookies.get('jwt_token')
-        const url ='https://inventory-management-jj3z.onrender.com/api/products/export'
-        const options = {
-          method : "GET",
-          headers : {
-              Authorization: `Bearer ${token}`, }
-          }
-        const response = await fetch(url, options)
-
-        const blob = await response.blob();
-        const urllink = window.URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = urllink;
-        a.download = "products.csv";
-        document.body.appendChild(a);
-        a.click();
-
-        a.remove();
-        window.URL.revokeObjectURL(urllink);
-        } catch (error) {
-          console.error("CSV Download Error:", error);
-        }
-    }
-
     const onClickDropDown = (e) => {
       setCategory(e.target.value)
       getFilterProducts(query, category)
@@ -71,7 +45,7 @@ function Header({ getFilterProducts}) {
             <button className='bg-white rounded w-[140px]'>Add new Product</button>
         </div>
         <div className='md:w-[50%] sm:w-[100%] flex justify-around'>
-            <button className='bg-white rounded w-[70px]' onClick={onClickExport}>Export</button>
+           
             <button className='bg-blue-500 rounder w-[70px] text-white' onClick={onClickLogout}>Logout</button>
         </div>
         

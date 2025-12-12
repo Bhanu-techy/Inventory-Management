@@ -1,24 +1,18 @@
 const express = require("express")
 const app = express();
-const router = express.Router();
-const PORT = 3000;
+const PORT = 5000;
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 const cors = require("cors")
-app.use("/api", router);
 
-app.use(cors())
+//app.use(cors())
 
 app.use(express.json());
 
 const sqlite3 = require('sqlite3').verbose();
 const db = new sqlite3.Database('./inventory.db');
 
-const multer = require('multer');
 
-const upload = multer({
-  dest: 'uploads/'   
-});
 
 const authenticateToken = (request, response, next) => {
   let jwtToken;
@@ -42,7 +36,7 @@ const authenticateToken = (request, response, next) => {
 };
 
 
-app.get("/users", authenticateToken, (req, res)=>{
+app.get("/users", authenticateToken , (req, res)=>{
   db.all(`select * from users`,[],(err, rows) =>{
     res.json(rows)
   })
@@ -101,67 +95,8 @@ app.delete("/users/:id", async (req, res)=>{
   res.json({msg : 'done'})
 })
 
-router.post("/import", upload.single("csvFile"), (req, res) => {
-  const filePath = req.file.path;
-  const results = [];
 
-  // Read the CSV file
-  fs.createReadStream(filePath)
-    .pipe(csv())
-    .on("data", (row) => {
-      results.push(row);
-    })
-    .on("end", () => {
-      let added = 0;
-      let skipped = 0;
-      let skippedItems = [];
-
-      // Process each product row
-      results.forEach((product) => {
-        db.get(
-          "SELECT id FROM products WHERE name = ?",
-          [product.name],
-          (err, existing) => {
-
-            if (existing) {
-              skipped++;
-              skippedItems.push(product);
-            } else {
-              db.run(
-                `INSERT INTO products (name, unit, category, brand, stock, status, image)
-                 VALUES (?, ?, ?, ?, ?, ?, ?)`,
-                [
-                  product.name,
-                  product.unit,
-                  product.category,
-                  product.brand,
-                  product.stock,
-                  product.status,
-                  product.image
-                ]
-              );
-              added++;
-            }
-          }
-        );
-      });
-
-      // Wait a moment for async inserts
-      setTimeout(() => {
-        res.json({
-          message: "Import completed",
-          addedCount: added,
-          skippedCount: skipped,
-          skippedItems,
-        });
-
-        // delete uploaded CSV file
-        fs.unlinkSync(filePath);
-      }, 500);
-    });
-});
-
-app.get("/api/products", authenticateToken, (req, res) => {
+app.get("/api/products", (req, res) => {
   let { name, category } = req.query;
 
   // Convert " " " into empty string
@@ -250,28 +185,20 @@ app.get("/api/products/:id/history", authenticateToken, (req, res) => {
   });
 });
 
-router.options("/products/export", cors());
+app.post("/products", async (req, res)=>{
+  const {name, stock, category, brand} = req.body
 
-router.get("/products/export", cors(), authenticateToken, (req, res) => {
-    db.all("SELECT * FROM products", [], (err, rows) => {
-        if (err) {
-            return res.status(500).json({ error: "Database error" });
-        }
+  const addQuery = `insert into products (name, category, brand, stock)
+  values('${name}', '${category}', '${brand}', ${stock})`
 
-        let csv = "id,name,unit,category,brand,stock,status,image\n";
-
-        rows.forEach(row => {
-            csv += `${row.id},${row.name},${row.unit},${row.category},${row.brand},${row.stock},${row.status},${row.image}\n`;
-        });
-
-        res.setHeader("Content-Type", "text/csv");
-        res.setHeader("Content-Disposition", "attachment; filename=products.csv");
-
-        res.send(csv);
-    });
-});
+  const dbResponse = await db.run(addQuery)
+  const productId = dbResponse.lastID
+  res.send(productId)
+})
 
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+
