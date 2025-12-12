@@ -185,7 +185,7 @@ app.get("/api/products/:id/history", authenticateToken, (req, res) => {
   });
 });
 
-app.post("/products", async (req, res)=>{
+app.post("/products",authenticateToken, async (req, res)=>{
   const {name, stock, category, brand} = req.body
 
   const addQuery = `insert into products (name, category, brand, stock)

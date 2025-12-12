@@ -2,11 +2,17 @@ import {useState} from 'react'
 import Cookies from 'js-cookie'
 import { useNavigate } from 'react-router-dom';
 import { FiSearch } from "react-icons/fi";
+import Popup from 'reactjs-popup'
+
+import 'reactjs-popup/dist/index.css'
 
 function Header({ getFilterProducts}) {
 
   const [query, setQuery] = useState("")
   const [category, setCategory] = useState("")
+  const [name, setName] = useState("")
+  const [addcategory, setAddCategory] = useState("")
+  const [stock, setStock] = useState(0)
 
   const navigate = useNavigate()
 
@@ -42,7 +48,17 @@ function Header({ getFilterProducts}) {
                 <option value="Dairy" >Dairy</option>
                 <option value="Personal care">Personal care</option>
              </select>
-            <button className='bg-white rounded w-[140px]'>Add new Product</button>
+            
+            <div className="popup-container">
+          <Popup
+            trigger={
+              <button className='bg-white rounded w-[140px]'>Add new Product</button>
+            }
+            position="bottom left"
+          >
+            <p>React is a popular and widely used programming language</p>
+          </Popup>
+ </div>
         </div>
         <div className='md:w-[50%] sm:w-[100%] flex justify-around'>
            
